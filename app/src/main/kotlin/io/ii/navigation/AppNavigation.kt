@@ -3,6 +3,7 @@ package io.ii.navigation
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -16,6 +17,9 @@ import io.ii.screen.TaskDetailsScreen
 @Composable
 fun Navigation() {
     val backStack = rememberNavBackStack(ProjectsKey)
+    val navigator = remember(backStack) {
+        Navigator(backStack)
+    }
 
     LaunchedEffect(backStack) {
         snapshotFlow { backStack.toList() }
@@ -26,13 +30,13 @@ fun Navigation() {
 
     NavDisplay(
         backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
+        onBack = { navigator.onBack() },
         entryProvider = entryProvider {
             entry<ProjectsKey> {
                 ProjectsScreen(
                     projects = FakeProjectData.getAll(),
                     onProjectClick = { projectId ->
-                        backStack.add(ProjectDetailsKey(projectId))
+                        navigator.navigate(ProjectDetailsKey(projectId))
                     }
                 )
             }
@@ -46,7 +50,7 @@ fun Navigation() {
                     ProjectDetailsScreen(
                         project = project,
                         onTaskClick = { taskId ->
-                            backStack.add(
+                            navigator.navigate(
                                 TaskDetailsKey(
                                     taskId = taskId,
                                     projectId = project.id
