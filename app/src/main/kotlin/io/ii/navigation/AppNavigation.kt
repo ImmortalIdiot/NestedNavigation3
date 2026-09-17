@@ -8,14 +8,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import data.FakeProjectData
 import io.ii.screen.NotFoundScreen
@@ -28,22 +24,10 @@ import io.ii.screen.projects.TaskDetailsScreen
 @Composable
 fun Navigation() {
 
-    val projectBackStack = rememberNavBackStack(ProjectKey)
-    val activityBackStack = rememberNavBackStack(ActivityKey)
-    val profileBackStack = rememberNavBackStack(ProfileKey)
+    val navState = rememberNavigationState(startTopLevelKey = ProjectKey)
 
-    var selectedTopLevelKey by remember {
-        mutableStateOf<TopLevelNavKey>(ProjectKey)
-    }
-
-    val selectedBackStack = when (selectedTopLevelKey) {
-        ProjectKey -> projectBackStack
-        ActivityKey -> activityBackStack
-        ProfileKey -> profileBackStack
-    }
-
-    val navigator = remember(selectedBackStack) {
-        Navigator(selectedBackStack)
+    val navigator = remember(navState.selectedBackStack) {
+        Navigator(navState.selectedBackStack)
     }
 
     Scaffold(
@@ -54,21 +38,21 @@ fun Navigation() {
             ) {
                 Button(
                     onClick = {
-                        selectedTopLevelKey = ProjectKey
+                        navState.selectedTopLevelKey = ProjectKey
                     }
                 ) {
                     Text("Projects")
                 }
                 Button(
                     onClick = {
-                        selectedTopLevelKey = ActivityKey
+                        navState.selectedTopLevelKey = ActivityKey
                     }
                 ) {
                     Text("Activity")
                 }
                 Button(
                     onClick = {
-                        selectedTopLevelKey = ProfileKey
+                        navState.selectedTopLevelKey = ProfileKey
                     }
                 ) {
                     Text("Profile")
@@ -78,7 +62,7 @@ fun Navigation() {
     ) { paddings ->
         NavDisplay(
             modifier = Modifier.padding(paddings),
-            backStack = selectedBackStack,
+            backStack = navState.selectedBackStack,
             onBack = { navigator.onBack() },
             entryProvider = entryProvider {
                 entry<ProjectKey> {
