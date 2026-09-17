@@ -1,78 +1,136 @@
 package io.ii.navigation
 
-import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import data.FakeProjectData
 import io.ii.screen.NotFoundScreen
-import io.ii.screen.ProjectDetailsScreen
-import io.ii.screen.ProjectsScreen
-import io.ii.screen.TaskDetailsScreen
+import io.ii.screen.activity.ActivityScreen
+import io.ii.screen.profile.ProfileScreen
+import io.ii.screen.projects.ProjectDetailsScreen
+import io.ii.screen.projects.ProjectsScreen
+import io.ii.screen.projects.TaskDetailsScreen
 
 @Composable
 fun Navigation() {
-    val backStack = rememberNavBackStack(ProjectsKey)
-    val navigator = remember(backStack) {
-        Navigator(backStack)
+
+    val projectBackStack = rememberNavBackStack(ProjectKey)
+    val activityBackStack = rememberNavBackStack(ActivityKey)
+    val profileBackStack = rememberNavBackStack(ProfileKey)
+
+    var selectedTopLevelKey by remember {
+        mutableStateOf<TopLevelNavKey>(ProjectKey)
     }
 
-    LaunchedEffect(backStack) {
-        snapshotFlow { backStack.toList() }
-            .collect { currentStack ->
-                Log.d("NavStack", currentStack.joinToString())
-            }
+    val selectedBackStack = when (selectedTopLevelKey) {
+        ProjectKey -> projectBackStack
+        ActivityKey -> activityBackStack
+        ProfileKey -> profileBackStack
     }
 
-    NavDisplay(
-        backStack = backStack,
-        onBack = { navigator.onBack() },
-        entryProvider = entryProvider {
-            entry<ProjectsKey> {
-                ProjectsScreen(
-                    projects = FakeProjectData.getAll(),
-                    onProjectClick = { projectId ->
-                        navigator.navigate(ProjectDetailsKey(projectId))
+    val navigator = remember(selectedBackStack) {
+        Navigator(selectedBackStack)
+    }
+
+    Scaffold(
+        bottomBar = {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 50.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Button(
+                    onClick = {
+                        selectedTopLevelKey = ProjectKey
                     }
-                )
-            }
-
-            entry<ProjectDetailsKey> { key ->
-                val project = FakeProjectData.getProject(key.projectId)
-
-                if (project == null) {
-                    NotFoundScreen("Project not found")
-                } else {
-                    ProjectDetailsScreen(
-                        project = project,
-                        onTaskClick = { taskId ->
-                            navigator.navigate(
-                                TaskDetailsKey(
-                                    taskId = taskId,
-                                    projectId = project.id
-                                )
-                            )
-                        }
-                    )
+                ) {
+                    Text("Projects")
                 }
-            }
-
-            entry<TaskDetailsKey> { key ->
-                val task = FakeProjectData.getTask(
-                    projectId = key.projectId,
-                    taskId = key.taskId
-                )
-
-                if (task == null) {
-                    NotFoundScreen("Task not found")
-                } else {
-                    TaskDetailsScreen(task)
+                Button(
+                    onClick = {
+                        selectedTopLevelKey = ActivityKey
+                    }
+                ) {
+                    Text("Activity")
+                }
+                Button(
+                    onClick = {
+                        selectedTopLevelKey = ProfileKey
+                    }
+                ) {
+                    Text("Profile")
                 }
             }
         }
-    )
+    ) { paddings ->
+        NavDisplay(
+            modifier = Modifier.padding(paddings),
+            backStack = selectedBackStack,
+            onBack = { navigator.onBack() },
+            entryProvider = entryProvider {
+                entry<ProjectKey> {
+                    ProjectsScreen(
+                        projects = FakeProjectData.getAll(),
+                        onProjectClick = { projectId ->
+                            navigator.navigate(ProjectDetailsKey(projectId))
+                        }
+                    )
+                }
+
+                entry<ActivityKey> {
+                    ActivityScreen()
+                }
+
+                entry<ProfileKey> {
+                    ProfileScreen(onSettings = {})
+                }
+
+                entry<ProjectDetailsKey> { key ->
+                    val project = FakeProjectData.getProject(key.projectId)
+
+                    if (project == null) {
+                        NotFoundScreen("Project not found")
+                    } else {
+                        ProjectDetailsScreen(
+                            project = project,
+                            onTaskClick = { taskId ->
+                                navigator.navigate(
+                                    TaskDetailsKey(
+                                        taskId = taskId,
+                                        projectId = project.id
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                entry<TaskDetailsKey> { key ->
+                    val task = FakeProjectData.getTask(
+                        projectId = key.projectId,
+                        taskId = key.taskId
+                    )
+
+                    if (task == null) {
+                        NotFoundScreen("Task not found")
+                    } else {
+                        TaskDetailsScreen(task)
+                    }
+                }
+            }
+        )
+    }
 }

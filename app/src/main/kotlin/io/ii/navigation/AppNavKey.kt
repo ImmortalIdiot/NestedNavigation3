@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 sealed interface AppNavKey : NavKey
 
 @Serializable
-data object ProjectsKey : AppNavKey
+sealed interface TopLevelNavKey : AppNavKey
 
 @Serializable
 data class ProjectDetailsKey(val projectId: String) : AppNavKey

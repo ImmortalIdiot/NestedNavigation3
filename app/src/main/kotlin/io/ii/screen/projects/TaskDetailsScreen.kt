@@ -1,4 +1,4 @@
-package io.ii.screen
+package io.ii.screen.projects
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
