@@ -5,7 +5,9 @@ class Navigator(
 ) {
     fun navigate(navKey: AppNavKey) {
 
-        require(navKey !is TopLevelNavKey)
+        require(navKey !is TopLevelNavKey) {
+            "Use 'selectTopLevel()' for top-level navigation"
+        }
 
         if (state.selectedBackStack.lastOrNull() != navKey) {
             state.selectedBackStack.add(navKey)
@@ -15,24 +17,38 @@ class Navigator(
     fun selectTopLevel(key: TopLevelNavKey) {
         if (key == state.selectedTopLevelKey) {
             while (state.selectedBackStack.size > 1) {
-                state.selectedBackStack.removeAt(state.selectedBackStack.lastIndex)
+                state.selectedBackStack.popLast()
             }
-        } else {
-            state.selectedTopLevelKey = key
+
+            return
         }
+
+        if (key == state.startTopLevelKey) {
+            state.topLevelHistory.clear()
+            state.topLevelHistory.add(key)
+            return
+        }
+
+        state.topLevelHistory.remove(key)
+        state.topLevelHistory.add(key)
     }
 
     fun onBack(): Boolean {
         if (state.selectedBackStack.size > 1) {
-            state.selectedBackStack.removeAt(state.selectedBackStack.lastIndex)
+            state.selectedBackStack.popLast()
             return true
         }
 
-        if (state.selectedTopLevelKey != state.startTopLevelKey) {
-            state.selectedTopLevelKey = state.startTopLevelKey
+        if (state.topLevelHistory.size > 1) {
+            state.topLevelHistory.popLast()
+
             return true
         }
 
         return false
     }
+}
+
+private fun <T> MutableList<T>.popLast(): T {
+    return removeAt(lastIndex)
 }

@@ -14,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import data.FakeProjectData
@@ -32,6 +34,60 @@ fun Navigation() {
     val navigator = remember(navState) {
         Navigator(navState)
     }
+
+    val appEntryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
+        entry<ProjectKey> {
+            ProjectsScreen(
+                projects = FakeProjectData.getAll(),
+                onProjectClick = { projectId ->
+                    navigator.navigate(ProjectDetailsKey(projectId))
+                }
+            )
+        }
+
+        entry<ActivityKey> {
+            ActivityScreen()
+        }
+
+        entry<ProfileKey> {
+            ProfileScreen(onSettings = {})
+        }
+
+        entry<ProjectDetailsKey> { key ->
+            val project = FakeProjectData.getProject(key.projectId)
+
+            if (project == null) {
+                NotFoundScreen("Project not found")
+            } else {
+                ProjectDetailsScreen(
+                    project = project,
+                    onTaskClick = { taskId ->
+                        navigator.navigate(
+                            TaskDetailsKey(
+                                taskId = taskId,
+                                projectId = project.id
+                            )
+                        )
+                    }
+                )
+            }
+        }
+
+        entry<TaskDetailsKey> { key ->
+            val task = FakeProjectData.getTask(
+                projectId = key.projectId,
+                taskId = key.taskId
+            )
+
+            if (task == null) {
+                NotFoundScreen("Task not found")
+            } else {
+                TaskDetailsScreen(task)
+            }
+        }
+    }
+
+    val entries = navState.toEntries(appEntryProvider)
 
     LaunchedEffect(navState) {
         snapshotFlow { navState.selectedBackStack.toList() }
@@ -72,59 +128,8 @@ fun Navigation() {
     ) { paddings ->
         NavDisplay(
             modifier = Modifier.padding(paddings),
-            backStack = navState.selectedBackStack,
+            entries = entries,
             onBack = { navigator.onBack() },
-            entryProvider = entryProvider {
-                entry<ProjectKey> {
-                    ProjectsScreen(
-                        projects = FakeProjectData.getAll(),
-                        onProjectClick = { projectId ->
-                            navigator.navigate(ProjectDetailsKey(projectId))
-                        }
-                    )
-                }
-
-                entry<ActivityKey> {
-                    ActivityScreen()
-                }
-
-                entry<ProfileKey> {
-                    ProfileScreen(onSettings = {})
-                }
-
-                entry<ProjectDetailsKey> { key ->
-                    val project = FakeProjectData.getProject(key.projectId)
-
-                    if (project == null) {
-                        NotFoundScreen("Project not found")
-                    } else {
-                        ProjectDetailsScreen(
-                            project = project,
-                            onTaskClick = { taskId ->
-                                navigator.navigate(
-                                    TaskDetailsKey(
-                                        taskId = taskId,
-                                        projectId = project.id
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
-
-                entry<TaskDetailsKey> { key ->
-                    val task = FakeProjectData.getTask(
-                        projectId = key.projectId,
-                        taskId = key.taskId
-                    )
-
-                    if (task == null) {
-                        NotFoundScreen("Task not found")
-                    } else {
-                        TaskDetailsScreen(task)
-                    }
-                }
-            }
         )
     }
 }
