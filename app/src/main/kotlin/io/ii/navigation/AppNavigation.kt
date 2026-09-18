@@ -18,20 +18,12 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import data.FakeProjectData
 import io.ii.navigation.key.ActivityKey
 import io.ii.navigation.key.ProfileKey
-import io.ii.navigation.key.ProjectDetailsKey
 import io.ii.navigation.key.ProjectKey
-import io.ii.navigation.key.SettingsKey
-import io.ii.navigation.key.TaskDetailsKey
-import io.ii.screen.NotFoundScreen
-import io.ii.screen.activity.ActivityScreen
-import io.ii.screen.profile.ProfileScreen
-import io.ii.screen.profile.SettingsScreen
-import io.ii.screen.projects.ProjectDetailsScreen
-import io.ii.screen.projects.ProjectsScreen
-import io.ii.screen.projects.TaskDetailsScreen
+import io.ii.screen.activity.activityEntries
+import io.ii.screen.profile.profileEntries
+import io.ii.screen.projects.projectEntries
 
 @Composable
 fun Navigation() {
@@ -42,63 +34,7 @@ fun Navigation() {
         Navigator(navState)
     }
 
-    val appEntryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
-        entry<ProjectKey> {
-            ProjectsScreen(
-                projects = FakeProjectData.getAll(),
-                onProjectClick = { projectId ->
-                    navigator.navigate(ProjectDetailsKey(projectId))
-                }
-            )
-        }
-
-        entry<ActivityKey> {
-            ActivityScreen()
-        }
-
-        entry<ProfileKey> {
-            ProfileScreen(onSettings = { navigator.navigate(SettingsKey)})
-        }
-
-        entry<SettingsKey> {
-            SettingsScreen()
-        }
-
-        entry<ProjectDetailsKey> { key ->
-            val project = FakeProjectData.getProject(key.projectId)
-
-            if (project == null) {
-                NotFoundScreen("Project not found")
-            } else {
-                ProjectDetailsScreen(
-                    project = project,
-                    onTaskClick = { taskId ->
-                        navigator.navigate(
-                            TaskDetailsKey(
-                                taskId = taskId,
-                                projectId = project.id
-                            )
-                        )
-                    }
-                )
-            }
-        }
-
-        entry<TaskDetailsKey> { key ->
-            val task = FakeProjectData.getTask(
-                projectId = key.projectId,
-                taskId = key.taskId
-            )
-
-            if (task == null) {
-                NotFoundScreen("Task not found")
-            } else {
-                TaskDetailsScreen(task)
-            }
-        }
-    }
-
-    val entries = navState.toEntries(appEntryProvider)
+    val entries = navState.toEntries(appEntryProvider(navigator))
 
     LaunchedEffect(navState) {
         snapshotFlow { navState.selectedBackStack.toList() }
@@ -142,5 +78,15 @@ fun Navigation() {
             entries = entries,
             onBack = { navigator.onBack() },
         )
+    }
+}
+
+fun appEntryProvider(
+    navigator: Navigator
+): (NavKey) -> NavEntry<NavKey> {
+    return entryProvider {
+        projectEntries { key -> navigator.navigate(key) }
+        activityEntries()
+        profileEntries { key -> navigator.navigate(key) }
     }
 }
