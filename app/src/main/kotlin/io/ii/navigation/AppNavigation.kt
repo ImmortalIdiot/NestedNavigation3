@@ -1,5 +1,6 @@
 package io.ii.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,7 +9,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
@@ -26,8 +29,15 @@ fun Navigation() {
 
     val navState = rememberNavigationState(startTopLevelKey = ProjectKey)
 
-    val navigator = remember(navState.selectedBackStack) {
-        Navigator(navState.selectedBackStack)
+    val navigator = remember(navState) {
+        Navigator(navState)
+    }
+
+    LaunchedEffect(navState) {
+        snapshotFlow { navState.selectedBackStack.toList() }
+            .collect {
+                Log.d("Backstack", navState.selectedBackStack.joinToString())
+            }
     }
 
     Scaffold(
@@ -38,21 +48,21 @@ fun Navigation() {
             ) {
                 Button(
                     onClick = {
-                        navState.selectedTopLevelKey = ProjectKey
+                        navigator.selectTopLevel(ProjectKey)
                     }
                 ) {
                     Text("Projects")
                 }
                 Button(
                     onClick = {
-                        navState.selectedTopLevelKey = ActivityKey
+                        navigator.selectTopLevel(ActivityKey)
                     }
                 ) {
                     Text("Activity")
                 }
                 Button(
                     onClick = {
-                        navState.selectedTopLevelKey = ProfileKey
+                        navigator.selectTopLevel(ProfileKey)
                     }
                 ) {
                     Text("Profile")

@@ -1,22 +1,38 @@
 package io.ii.navigation
 
-import androidx.navigation3.runtime.NavKey
-
 class Navigator(
-    private val backStack: MutableList<NavKey>
+    private val state: NavigationState
 ) {
     fun navigate(navKey: AppNavKey) {
-        if (backStack.lastOrNull() != navKey) {
-            backStack.add(navKey)
+
+        require(navKey !is TopLevelNavKey)
+
+        if (state.selectedBackStack.lastOrNull() != navKey) {
+            state.selectedBackStack.add(navKey)
+        }
+    }
+
+    fun selectTopLevel(key: TopLevelNavKey) {
+        if (key == state.selectedTopLevelKey) {
+            while (state.selectedBackStack.size > 1) {
+                state.selectedBackStack.removeAt(state.selectedBackStack.lastIndex)
+            }
+        } else {
+            state.selectedTopLevelKey = key
         }
     }
 
     fun onBack(): Boolean {
-        if (backStack.size <= 1) {
-            return false
+        if (state.selectedBackStack.size > 1) {
+            state.selectedBackStack.removeAt(state.selectedBackStack.lastIndex)
+            return true
         }
 
-        backStack.removeAt(backStack.lastIndex)
-        return true
+        if (state.selectedTopLevelKey != state.startTopLevelKey) {
+            state.selectedTopLevelKey = state.startTopLevelKey
+            return true
+        }
+
+        return false
     }
 }

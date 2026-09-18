@@ -14,13 +14,14 @@ class NavigationState(
     val backStacks: Map<TopLevelNavKey, NavBackStack<NavKey>>
 ) {
     var selectedTopLevelKey by mutableStateOf(startTopLevelKey)
-
     val selectedBackStack: NavBackStack<NavKey>
         get() = backStacks.getValue(selectedTopLevelKey)
 }
 
 @Composable
-fun rememberNavigationState(startTopLevelKey: TopLevelNavKey): NavigationState {
+fun rememberNavigationState(
+    startTopLevelKey: TopLevelNavKey,
+): NavigationState {
     val projectBackStack = rememberNavBackStack(ProjectKey)
     val activityBackStack = rememberNavBackStack(ActivityKey)
     val profileBackStack = rememberNavBackStack(ProfileKey)
