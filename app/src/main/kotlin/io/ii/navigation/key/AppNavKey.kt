@@ -5,12 +5,3 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface AppNavKey : NavKey
-
-@Serializable
-sealed interface TopLevelNavKey : AppNavKey
-
-@Serializable
-data class ProjectDetailsKey(val projectId: String) : AppNavKey
-
-@Serializable
-data class TaskDetailsKey(val taskId: String, val projectId: String) : AppNavKey

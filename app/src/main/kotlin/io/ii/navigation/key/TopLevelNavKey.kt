@@ -3,10 +3,13 @@ package io.ii.navigation.key
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object ProjectKey : TopLevelNavKey
+sealed interface TopLevelNavKey : AppNavKey
+
+@Serializable
+data object ProjectKey : TopLevelNavKey, ProjectsNavKey
 
 @Serializable
 data object ActivityKey : TopLevelNavKey
 
 @Serializable
-data object ProfileKey : TopLevelNavKey
+data object ProfileKey : TopLevelNavKey, ProfileNavKey

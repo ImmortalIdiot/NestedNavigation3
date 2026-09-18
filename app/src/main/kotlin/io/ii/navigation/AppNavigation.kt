@@ -23,10 +23,12 @@ import io.ii.navigation.key.ActivityKey
 import io.ii.navigation.key.ProfileKey
 import io.ii.navigation.key.ProjectDetailsKey
 import io.ii.navigation.key.ProjectKey
+import io.ii.navigation.key.SettingsKey
 import io.ii.navigation.key.TaskDetailsKey
 import io.ii.screen.NotFoundScreen
 import io.ii.screen.activity.ActivityScreen
 import io.ii.screen.profile.ProfileScreen
+import io.ii.screen.profile.SettingsScreen
 import io.ii.screen.projects.ProjectDetailsScreen
 import io.ii.screen.projects.ProjectsScreen
 import io.ii.screen.projects.TaskDetailsScreen
@@ -55,7 +57,11 @@ fun Navigation() {
         }
 
         entry<ProfileKey> {
-            ProfileScreen(onSettings = {})
+            ProfileScreen(onSettings = { navigator.navigate(SettingsKey)})
+        }
+
+        entry<SettingsKey> {
+            SettingsScreen()
         }
 
         entry<ProjectDetailsKey> { key ->
