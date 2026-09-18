@@ -3,6 +3,7 @@ package io.ii.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.navigation3.runtime.NavBackStack
@@ -39,7 +40,7 @@ fun rememberNavigationState(
     val activityBackStack = rememberNavBackStack(ActivityKey)
     val profileBackStack = rememberNavBackStack(ProfileKey)
 
-    val backStacks: Map<TopLevelNavKey, NavBackStack<NavKey>> = remember(
+    val backStacks: Map<TopLevelNavKey, NavBackStack<NavKey>> = rememberSaveable(
         projectBackStack,
         activityBackStack,
         profileBackStack
@@ -51,7 +52,7 @@ fun rememberNavigationState(
         )
     }
 
-    val topLevelHistory = remember { mutableStateListOf(startTopLevelKey) }
+    val topLevelHistory = rememberSaveable { mutableStateListOf(startTopLevelKey) }
 
     return remember(startTopLevelKey, backStacks) {
         NavigationState(
