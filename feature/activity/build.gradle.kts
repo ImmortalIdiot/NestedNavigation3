@@ -1,11 +1,11 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "io.ii"
+    namespace = "io.ii.activity"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -13,24 +13,13 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.ii"
         minSdk = 33
-        targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
-    }
-
-    buildTypes {
-        release {
-            optimization {
-                enable = false
-            }
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     buildFeatures {
         compose = true
     }
@@ -38,9 +27,6 @@ android {
 
 dependencies {
     implementation(projects.navigationApi)
-    implementation(projects.feature.projects.presentation)
-    implementation(projects.feature.activity)
-    implementation(projects.feature.profile)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -48,11 +34,9 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.core.ktx)
 
-    implementation(libs.navigation3.runtime)
     implementation(libs.navigation3.ui)
-
     implementation(libs.kotlinx.serialization.core)
 }

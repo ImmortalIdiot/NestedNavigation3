@@ -1,7 +1,7 @@
 package io.ii.navigation
 
-import io.ii.navigation.key.AppNavKey
-import io.ii.navigation.key.TopLevelNavKey
+import io.ii.AppNavKey
+import io.ii.TopLevelNavKey
 
 class Navigator(
     private val state: NavigationState

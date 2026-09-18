@@ -22,6 +22,16 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "NestedNavigaiton3"
 include(":app")
- 
+
+include(":navigation-api")
+
+include(":feature:activity")
+include(":feature:profile")
+
+include(":feature:projects:data")
+include(":feature:projects:domain")
+include(":feature:projects:presentation")

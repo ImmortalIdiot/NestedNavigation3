@@ -18,12 +18,12 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import io.ii.navigation.key.ActivityKey
-import io.ii.navigation.key.ProfileKey
-import io.ii.navigation.key.ProjectKey
-import io.ii.screen.activity.activityEntries
-import io.ii.screen.profile.profileEntries
-import io.ii.screen.projects.projectEntries
+import io.ii.activity.navigation.ActivityKey
+import io.ii.activity.navigation.activityEntries
+import io.ii.profile.navigation.ProfileKey
+import io.ii.profile.navigation.profileEntries
+import io.ii.projects.navigation.ProjectKey
+import io.ii.projects.navigation.projectEntries
 
 @Composable
 fun Navigation() {
