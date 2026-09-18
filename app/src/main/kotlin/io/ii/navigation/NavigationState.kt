@@ -1,6 +1,7 @@
 package io.ii.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,9 +14,6 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import io.ii.TopLevelNavKey
-import io.ii.activity.navigation.ActivityKey
-import io.ii.profile.navigation.ProfileKey
-import io.ii.projects.navigation.ProjectKey
 
 class NavigationState(
     val startTopLevelKey: TopLevelNavKey,
@@ -34,23 +32,10 @@ class NavigationState(
 
 @Composable
 fun rememberNavigationState(
+    topLevelKeys: Set<TopLevelNavKey>,
     startTopLevelKey: TopLevelNavKey,
 ): NavigationState {
-    val projectBackStack = rememberNavBackStack(ProjectKey)
-    val activityBackStack = rememberNavBackStack(ActivityKey)
-    val profileBackStack = rememberNavBackStack(ProfileKey)
-
-    val backStacks: Map<TopLevelNavKey, NavBackStack<NavKey>> = rememberSaveable(
-        projectBackStack,
-        activityBackStack,
-        profileBackStack
-    ) {
-        mapOf(
-            ProjectKey to projectBackStack,
-            ActivityKey to activityBackStack,
-            ProfileKey to profileBackStack
-        )
-    }
+    val backStacks = rememberTopLevelBackStacks(topLevelKeys)
 
     val topLevelHistory = rememberSaveable { mutableStateListOf(startTopLevelKey) }
 
@@ -60,6 +45,24 @@ fun rememberNavigationState(
             backStacks = backStacks,
             topLevelHistory = topLevelHistory
         )
+    }
+}
+
+@Composable
+private fun rememberTopLevelBackStacks(
+    topLevelKeys: Set<TopLevelNavKey>
+): Map<TopLevelNavKey, NavBackStack<NavKey>> {
+
+    val backStacks = topLevelKeys.map { topLevelKey ->
+        key(topLevelKey) {
+            rememberNavBackStack(topLevelKey)
+        }
+    }
+
+    return remember(topLevelKeys, backStacks) {
+        topLevelKeys
+            .zip(backStacks)
+            .toMap()
     }
 }
 

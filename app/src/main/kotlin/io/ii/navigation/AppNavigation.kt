@@ -28,7 +28,14 @@ import io.ii.projects.navigation.projectEntries
 @Composable
 fun Navigation() {
 
-    val navState = rememberNavigationState(startTopLevelKey = ProjectKey)
+    val navState = rememberNavigationState(
+        topLevelKeys = setOf(
+            ProjectKey,
+            ActivityKey,
+            ProfileKey
+        ),
+        startTopLevelKey = ProjectKey
+    )
 
     val navigator = remember(navState) {
         Navigator(navState)
