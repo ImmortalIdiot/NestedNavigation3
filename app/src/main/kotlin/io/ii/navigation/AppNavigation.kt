@@ -19,6 +19,11 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import data.FakeProjectData
+import io.ii.navigation.key.ActivityKey
+import io.ii.navigation.key.ProfileKey
+import io.ii.navigation.key.ProjectDetailsKey
+import io.ii.navigation.key.ProjectKey
+import io.ii.navigation.key.TaskDetailsKey
 import io.ii.screen.NotFoundScreen
 import io.ii.screen.activity.ActivityScreen
 import io.ii.screen.profile.ProfileScreen

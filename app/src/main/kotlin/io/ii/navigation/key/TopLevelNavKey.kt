@@ -1,4 +1,4 @@
-package io.ii.navigation
+package io.ii.navigation.key
 
 import kotlinx.serialization.Serializable
 
