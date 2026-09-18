@@ -11,66 +11,82 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.ii.domain.model.Task
 import io.ii.domain.model.TaskStatus
+import io.ii.projects.viewmodel.TaskDetailsUiState
+import io.ii.projects.viewmodel.TaskDetailsViewModel
 
 @Composable
 fun TaskDetailsScreen(
-    task: Task
+    viewModel: TaskDetailsViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val scroll = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scroll)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = task.title,
-            style = MaterialTheme.typography.headlineLarge
-        )
+    when (uiState) {
+        is TaskDetailsUiState.Content -> {
+            val task = (uiState as TaskDetailsUiState.Content).task
 
-        TaskStatusLabel(status = task.status)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scroll)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = task.title,
+                    style = MaterialTheme.typography.headlineLarge
+                )
 
-        HorizontalDivider()
+                TaskStatusLabel(status = task.status)
 
-        Text(
-            text = "Description",
-            style = MaterialTheme.typography.titleMedium
-        )
+                HorizontalDivider()
 
-        Text(
-            text = task.description,
-            style = MaterialTheme.typography.bodyLarge
-        )
+                Text(
+                    text = "Description",
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-        HorizontalDivider()
+                Text(
+                    text = task.description,
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-        Text(
-            text = "Task ID",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+                HorizontalDivider()
 
-        Text(
-            text = task.id,
-            style = MaterialTheme.typography.bodyMedium
-        )
+                Text(
+                    text = "Task ID",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
-        Text(
-            text = "Project ID",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+                Text(
+                    text = task.id,
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-        Text(
-            text = task.projectId,
-            style = MaterialTheme.typography.bodyMedium
-        )
+                Text(
+                    text = "Project ID",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text = task.projectId,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        TaskDetailsUiState.NotFound -> {
+            NotFoundScreen("Task not found")
+        }
+
+        else -> {}
     }
 }
 

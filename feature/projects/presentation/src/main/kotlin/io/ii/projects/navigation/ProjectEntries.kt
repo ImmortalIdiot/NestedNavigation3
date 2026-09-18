@@ -3,18 +3,22 @@ package io.ii.projects.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import io.ii.AppNavKey
-import io.ii.data.FakeProjectData
-import io.ii.projects.screen.NotFoundScreen
 import io.ii.projects.screen.ProjectDetailsScreen
 import io.ii.projects.screen.ProjectsScreen
 import io.ii.projects.screen.TaskDetailsScreen
+import io.ii.projects.viewmodel.ProjectDetailsViewModel
+import io.ii.projects.viewmodel.ProjectsViewModel
+import io.ii.projects.viewmodel.TaskDetailsViewModel
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 fun EntryProviderScope<NavKey>.projectEntries(
     navigate: (AppNavKey) -> Unit
 ) {
     entry<ProjectKey> {
+        val viewModel = koinViewModel<ProjectsViewModel>()
         ProjectsScreen(
-            projects = FakeProjectData.getAll(),
+            viewModel = viewModel,
             onProjectClick = { projectId ->
                 navigate(ProjectDetailsKey(projectId))
             }
@@ -22,35 +26,31 @@ fun EntryProviderScope<NavKey>.projectEntries(
     }
 
     entry<ProjectDetailsKey> { key ->
-        val project = FakeProjectData.getProject(key.projectId)
-
-        if (project == null) {
-            NotFoundScreen("Project not found")
-        } else {
-            ProjectDetailsScreen(
-                project = project,
-                onTaskClick = { taskId ->
-                    navigate(
-                        TaskDetailsKey(
-                            taskId = taskId,
-                            projectId = project.id
-                        )
-                    )
-                }
-            )
+        val viewModel = koinViewModel<ProjectDetailsViewModel> {
+            parametersOf(key.projectId)
         }
+
+        ProjectDetailsScreen(
+            viewModel = viewModel,
+            onTaskClick = { taskId ->
+                navigate(
+                    TaskDetailsKey(
+                        taskId = taskId,
+                        projectId = key.projectId
+                    )
+                )
+            }
+        )
     }
 
     entry<TaskDetailsKey> { key ->
-        val task = FakeProjectData.getTask(
-            projectId = key.projectId,
-            taskId = key.taskId
-        )
-
-        if (task == null) {
-            NotFoundScreen("Task not found")
-        } else {
-            TaskDetailsScreen(task)
+        val viewModel = koinViewModel<TaskDetailsViewModel> {
+            parametersOf(
+                key.projectId,
+                key.taskId
+            )
         }
+
+        TaskDetailsScreen(viewModel)
     }
 }

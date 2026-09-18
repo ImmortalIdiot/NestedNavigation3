@@ -12,15 +12,21 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.ii.domain.model.Project
+import io.ii.projects.viewmodel.ProjectsUiState
+import io.ii.projects.viewmodel.ProjectsViewModel
 
 @Composable
 fun ProjectsScreen(
-    projects: List<Project>,
+    viewModel: ProjectsViewModel,
     onProjectClick: (projectId: String) -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -33,26 +39,36 @@ fun ProjectsScreen(
             )
         }
 
-        if (projects.isEmpty()) {
-            item {
-                Text(
-                    text = "There are no projects yet.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            items(
-                items = projects,
-                key = { project -> project.id }
-            ) { project ->
-                ProjectCard(
-                    project = project,
-                    onClick = {
-                        onProjectClick(project.id)
+        when (uiState) {
+            is ProjectsUiState.Loading -> {}
+
+            is ProjectsUiState.Content -> {
+                val state = uiState as ProjectsUiState.Content
+
+                if (state.projects.isEmpty()) {
+                    item {
+                        Text(
+                            text = "There are no projects yet.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                )
+                }
+
+                items(
+                    items = state.projects,
+                    key = { project -> project.id }
+                ) { project ->
+                    ProjectCard(
+                        project = project,
+                        onClick = {
+                            onProjectClick(project.id)
+                        }
+                    )
+                }
             }
+
+            is ProjectsUiState.Error -> {}
         }
     }
 }

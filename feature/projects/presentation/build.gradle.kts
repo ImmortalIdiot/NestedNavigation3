@@ -29,10 +29,8 @@ android {
 
 dependencies {
     implementation(projects.navigationApi)
-    implementation(projects.feature.projects.domain)
 
-    // Usage the Data module is an example. Use DI instead of this
-    implementation(projects.feature.projects.data)
+    implementation(projects.feature.projects.domain)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -45,4 +43,8 @@ dependencies {
 
     implementation(libs.navigation3.ui)
     implementation(libs.kotlinx.serialization.core)
+
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose.viewmodel)
 }

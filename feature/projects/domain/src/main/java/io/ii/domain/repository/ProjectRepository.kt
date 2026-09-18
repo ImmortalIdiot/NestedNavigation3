@@ -1,7 +1,6 @@
 package io.ii.domain.repository
 
 import io.ii.domain.model.Project
-import io.ii.domain.model.Task
 
 interface ProjectRepository {
 

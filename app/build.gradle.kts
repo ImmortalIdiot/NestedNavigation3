@@ -38,7 +38,10 @@ android {
 
 dependencies {
     implementation(projects.navigationApi)
+
+    implementation(projects.feature.projects.di)
     implementation(projects.feature.projects.presentation)
+
     implementation(projects.feature.activity)
     implementation(projects.feature.profile)
 
@@ -55,4 +58,7 @@ dependencies {
     implementation(libs.navigation3.ui)
 
     implementation(libs.kotlinx.serialization.core)
+
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
 }

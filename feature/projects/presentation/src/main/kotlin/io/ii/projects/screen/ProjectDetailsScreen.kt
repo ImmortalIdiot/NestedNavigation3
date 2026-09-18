@@ -14,98 +14,114 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.ii.domain.model.Project
 import io.ii.domain.model.Task
 import io.ii.domain.model.TaskStatus
+import io.ii.projects.viewmodel.ProjectDetailsUiState
+import io.ii.projects.viewmodel.ProjectDetailsViewModel
 
 @Composable
 fun ProjectDetailsScreen(
-    project: Project,
+    viewModel: ProjectDetailsViewModel,
     onTaskClick: (taskId: String) -> Unit
 ) {
-    val completedTasks = project.tasks.count { task ->
-        task.status == TaskStatus.COMPLETED
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
-    val progress = if (project.tasks.isEmpty()) {
-        0f
-    } else {
-        completedTasks.toFloat() / project.tasks.size
-    }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Text(
-                text = project.title,
-                style = MaterialTheme.typography.headlineLarge
-            )
+    when (uiState) {
+        ProjectDetailsUiState.NotFound -> {
+            NotFoundScreen("Project not found")
         }
 
-        item {
-            Text(
-                text = project.description,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        is ProjectDetailsUiState.Content  -> {
+            val project = (uiState as ProjectDetailsUiState.Content).project
+            val completedTasks = project.tasks.count { task ->
+                task.status == TaskStatus.COMPLETED
+            }
 
-        item {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            val progress = if (project.tasks.isEmpty()) {
+                0f
+            } else {
+                completedTasks.toFloat() / project.tasks.size
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = "$completedTasks of ${project.tasks.size} tasks completed",
-                    style = MaterialTheme.typography.labelLarge
-                )
+                item {
+                    Text(
+                        text = project.title,
+                        style = MaterialTheme.typography.headlineLarge
+                    )
+                }
 
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
+                item {
+                    Text(
+                        text = project.description,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-        }
+                item {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "$completedTasks of ${project.tasks.size} tasks completed",
+                            style = MaterialTheme.typography.labelLarge
+                        )
 
-        item {
-            Text(
-                text = "Tasks",
-                style = MaterialTheme.typography.headlineSmall
-            )
-        }
-
-        if (project.tasks.isEmpty()) {
-            item {
-                Text(
-                    text = "This project does not have any tasks.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            items(
-                items = project.tasks,
-                key = { task -> task.id }
-            ) { task ->
-                TaskCard(
-                    task = task,
-                    onClick = {
-                        onTaskClick(task.id)
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
-                )
+                }
+
+                item {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+
+                item {
+                    Text(
+                        text = "Tasks",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+
+                if (project.tasks.isEmpty()) {
+                    item {
+                        Text(
+                            text = "This project does not have any tasks.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    items(
+                        items = project.tasks,
+                        key = { task -> task.id }
+                    ) { task ->
+                        TaskCard(
+                            task = task,
+                            onClick = {
+                                onTaskClick(task.id)
+                            }
+                        )
+                    }
+                }
             }
         }
+
+        else -> {}
     }
 }
 
