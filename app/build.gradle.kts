@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -13,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.ii"
+        applicationId = "io.ii.nestednavigation3"
         minSdk = 33
         targetSdk = 37
         versionCode = 1
@@ -46,18 +45,11 @@ dependencies {
     implementation(projects.feature.profile)
 
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(libs.navigation3.runtime)
     implementation(libs.navigation3.ui)
-
-    implementation(libs.kotlinx.serialization.core)
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)

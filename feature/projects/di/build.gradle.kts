@@ -4,6 +4,7 @@ plugins {
 
 android {
     namespace = "io.ii.di"
+
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -17,7 +18,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
 }
 
 dependencies {
