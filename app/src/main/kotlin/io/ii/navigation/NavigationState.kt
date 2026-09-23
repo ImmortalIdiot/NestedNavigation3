@@ -16,7 +16,6 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import io.ii.TopLevelNavKey
 
 class NavigationState(
-    val startTopLevelKey: TopLevelNavKey,
     val backStacks: Map<TopLevelNavKey, NavBackStack<NavKey>>,
     val topLevelHistory: SnapshotStateList<TopLevelNavKey>
 ) {
@@ -41,7 +40,6 @@ fun rememberNavigationState(
 
     return remember(startTopLevelKey, backStacks) {
         NavigationState(
-            startTopLevelKey = startTopLevelKey,
             backStacks = backStacks,
             topLevelHistory = topLevelHistory
         )
