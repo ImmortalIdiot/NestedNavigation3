@@ -26,12 +26,6 @@ class Navigator(
             return
         }
 
-        if (key == state.startTopLevelKey) {
-            state.topLevelHistory.clear()
-            state.topLevelHistory.add(key)
-            return
-        }
-
         state.topLevelHistory.remove(key)
         state.topLevelHistory.add(key)
     }
